@@ -1,0 +1,73 @@
+<div ng-if="gCtrl.status === 'loading'">
+	<h1 class="room_title">Loading room</h1>
+	<div class="room_container">
+		<div class="p_container">
+			<div class="p_username">Player 1</div>
+			<div class="p_status" ng-class="{'ready': gCtrl.player.is_ready}">
+				<span ng-if="gCtrl.player.is_ready">READY</span>
+				<span ng-if="!gCtrl.player.is_ready">WAITING</span>
+			</div>
+			<div class="status_mark" ng-click="setReady();"
+				ng-class="{'ready': gCtrl.player.is_ready, 
+				'clickable': !gCtrl.player.is_ready}">
+				<i class="fas fa-check-circle"></i>
+			</div>
+		</div>
+		<div class="p_container">
+			<div class="p_username">Player 2</div>
+			<div class="p_status" ng-class="{'ready': gCtrl.adversary.is_ready}">
+				<span ng-if="gCtrl.adversary.is_ready">READY</span>
+				<span ng-if="!gCtrl.adversary.is_ready">WAITING</span>
+			</div>
+			<div class="status_mark" ng-class="{'ready': gCtrl.adversary.is_ready}">
+				<div ng-if="gCtrl.adversary.is_ready">
+					<i class="fas fa-check-circle"></i>
+				</div>
+				<div ng-if="!gCtrl.adversary.is_ready">
+					<i class="fas fa-sync rotate"></i>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+<div ng-if="gCtrl.status !== 'loading'">
+	<h1 class="room_title">
+		<span ng-if="!gCtrl.instance.solved_by">Game in progress</span>
+		<span ng-if="gCtrl.instance.solved_by">Puzzle was solved!</span>
+	</h1>
+	<div class="room_container">
+		<div class="instance_view">
+			<div ng-repeat="(i, order) in gCtrl.instance.values" 
+			class="order_container" ng-class="{'envy': gCtrl.envy[i]}">
+				<div class="head"
+				ng-class="{'envy': gCtrl.envy[i]}">
+					<!-- <i class="fas fa-times"></i> -->
+				</div>
+				<div class="obj" ng-repeat="(j, obj) in order" 
+				ng-class="{'selected': gCtrl.selected[i] == j,
+				'too_many': gCtrl.number_of_select[obj] > 1}"
+				ng-click="select(i, j)"
+				ng-style="get_obj_style(i, j, obj)"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="winning_screen" ng-if="gCtrl.status === 'solved'">
+	<h2>
+		<div class="win_ann"
+		ng-if="gCtrl.instance.solved_by === gCtrl.player.token">
+			You won!
+		</div>
+		<div class="win_ann"
+		ng-if="gCtrl.instance.solved_by !== gCtrl.player.token">
+			You lost...
+		</div>
+	</h2>
+
+	<div id="menu_container">
+		<a href="#!/" id="menu_button">RETURN TO MENU</a>
+	</div>
+</div>

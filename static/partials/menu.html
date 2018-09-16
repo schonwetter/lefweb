@@ -1,0 +1,22 @@
+<div id="toolbar">
+	<span>Player#{[{player_token}]}</span>
+</div>
+
+<header>
+	<div id="header_img"><img src="/static/game/header_img.png"></div>
+	<h1 id="title">EQUITY</h1>
+</header>
+
+<div id="main_menu" >
+	<a href="#!play/{[{next_room_token}]}" id="play_button">START NEW GAME</a>
+	<div id="room_list">
+		<span ng-show="rooms.length == 0">No active rooms</span>
+		<ul ng-show="rooms.length > 0">
+			<li ng-repeat="room in rooms" >
+				<span>Room {[{ room.token }]}</span>
+				<a href="#!play/{[{room.token}]}">Join</a>
+				<a href="#!spectate/{[{room.token}]}">Spectate</a>
+			</li>
+		</ul>
+	</div>
+</div>

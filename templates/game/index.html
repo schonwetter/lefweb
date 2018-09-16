@@ -1,0 +1,23 @@
+{% load static %} 
+
+<!DOCTYPE html>
+<html ng-app="EquityGame">
+<head>
+	<title>Equity</title>
+	<link href="https://fonts.googleapis.com/css?family=Lato:700" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{% static 'game/main.css' %}">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+	<!-- libraries -->
+	<script src="{% static 'game/angular.min.js' %}"></script>
+	<script src="{% static 'game/angular-route.min.js' %}"></script>
+	<script src="{% static 'game/angular-cookies.min.js' %}"></script>
+	<script src="{% static 'game/reconnecting-websocket.min.js' %}"></script>
+	<!-- app -->
+	<script src="{% static 'game/init.js' %}"></script>
+	<script src="{% static 'game/websocket-service.js' %}"></script>
+	<script src="{% static 'game/main.js' %}"></script>
+</head>
+<body>
+	<div ng-view></div>
+</body>
+</html>
