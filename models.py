@@ -3,6 +3,18 @@ from random import shuffle, choice
 
 
 class LEFInstance(models.Model):
+	"""Represents a LEF instance in the database. It mostly acts as	a reference 
+	for the preference orders of each agents present in the instance.
+
+	Attributes:
+		solved_by (CharField): Token of player that "wins" the instance.
+		solution (CharField): Allocation submitted by the winner. Stored as
+			comma separated values in a string.
+		time_to_solution (IntegerField): Time taken (in seconds) to solve the 
+			instnace.
+		size (IntegerField): Size of instance.
+	"""
+
 	solved_by = models.CharField(max_length=8, null=True)
 	solution = models.CharField(max_length=13, null=True)
 	time_to_solution = models.IntegerField(default=0)
@@ -67,11 +79,18 @@ class LEFInstance(models.Model):
 			# Create LEFOrder
 			LEFOrder.objects.create(instance=instance, 
 				index=a, values=','.join(map(str, prefs)))
-			# pref_lists.append(prefs)
 
 		return instance
 
 	def check_solution(self, solution):
+		"""Checks if a specific allocation is valid for the instance, that is
+		no actor feel envy.
+
+		Args:
+			solution (dict): Allocation to be checked.
+
+		Returns: (boolean) Validity of the solution.
+		"""
 		if self.solved_by != None: return 
 
 		values = [p.get_values() for p in 
@@ -93,6 +112,11 @@ class LEFInstance(models.Model):
 		return True
 
 	def serialize(self):
+		"""Returns a serializable python object that can be sent over a 
+		websocket connection.
+
+		Returns: (dict) containing all relevant data.
+		"""
 		return {
 			'size': self.size,
 			'values': [p.get_values() for p in 
@@ -104,14 +128,18 @@ class LEFInstance(models.Model):
 
 
 class LEFOrder(models.Model):
-	"""Defines a preference order for a single agent in an instance.
-	The order is stored as comma separated values in a string.
+	"""Defines a preference order for a single actor in an instance. The order 
+	is stored as comma separated values in a string.
+
+	Attributes:
+		values (CharField): Order of objects.
+		instance (ForeignKey): Refering instance.
+		index (IntegerField): Index of corresponding actor in instance.
 	"""
 	values = models.CharField(max_length=13)
-	# refering instance
-	instance = models.ForeignKey(LEFInstance, on_delete=models.CASCADE, 
+	instance = models.ForeignKey(LEFInstance, 
+		on_delete=models.CASCADE, 
 		related_name='prefs')
-	# index of corresponding actor in instance 
 	index = models.IntegerField()
 
 	def get_values(self):
@@ -119,13 +147,25 @@ class LEFOrder(models.Model):
 
 
 class Room(models.Model):
+	"""Room identifies a room in which two players can interact with each other.
+	It also holds a reference to the instance the players are trying to solve.
+
+	Attributes:
+		token (CharField): Used to identify rooms in the webapp.
+		current_instance (ForeignKey): Reference to the instance the players are
+			currently trying to solve.
+	"""
 	token = models.CharField(max_length=8)
-	current_instance = models.ForeignKey(
-		LEFInstance, 
+	current_instance = models.ForeignKey(LEFInstance, 
 		on_delete=models.SET_NULL,
 		null=True)
 	
 	def serialize(self):
+		"""Returns a serializable python object that can be sent over a 
+		websocket connection.
+
+		Returns: (dict) containing all relevant data.
+		"""
 		return {
 			'token': self.token,
 			'connected_count': self.connected_players.count()
@@ -133,6 +173,16 @@ class Room(models.Model):
 
 
 class Player(models.Model):
+	"""Player identifies a player in the database.
+
+	Attributes:
+		username (CharField): Username of player.
+		token (CharField): Used to identify players in the webapp.
+		connected_to (ForeignKey): Reference to the room the player is currently
+			connected to.
+		is_ready (BooleanField): Status of player. True if the player is in a 
+			room and playing. False otherwise.
+	"""
 	username = models.CharField(max_length=40)
 	token = models.CharField(max_length=8)
 	connected_to = models.ForeignKey(Room, on_delete=models.SET_NULL, 
@@ -140,6 +190,11 @@ class Player(models.Model):
 	is_ready = models.BooleanField(default=False)
 
 	def serialize(self):
+		"""Returns a serializable python object that can be sent over a 
+		websocket connection.
+
+		Returns: (dict) containing all relevant data.
+		"""
 		return {
 			'username': self.username,
 			'token': self.token,
